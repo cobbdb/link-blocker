@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head></head>
+<body>
+    <a href="http://youtube.com">Click it</a>
+    <script>
+        (function () {
+            var i, el,
+                set = document.getElementsByTagName('a');
+            for (i = 0; i < set.length; i += 1) {
+                el = set[i];
+                el.addEventListener('click', function (e) {
+                    console.log('clicked it');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                });
+            }
+        }());
+    </script>
+</body>
+</html>
