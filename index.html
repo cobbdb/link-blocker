@@ -4,6 +4,7 @@
 <body>
     <a href="http://youtube.com">Click it</a>
     <script>
+        // anchor links
         (function () {
             var i, el,
                 set = document.getElementsByTagName('a');
@@ -17,6 +18,10 @@
                 });
             }
         }());
+        // calls to window.open
+        window.open = function (dest) {
+            console.log('nope lol');
+        };
     </script>
 </body>
 </html>
