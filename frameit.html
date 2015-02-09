@@ -1,19 +1,36 @@
 <!doctype html>
 <html>
 <head>
+    <style>
+        #om-frame {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
     <script>
         function nativeInline() {
             console.log('Native: inline');
         }
         function LBClick(el) {
             console.log('LB> anchor clicked');
+            var frame = document.createElement('iframe');
+            frame.id = 'om-frame';
+            document.body.innerHTML = '';
+            document.body.appendChild(frame);
+            frame.src = el.href;
         }
     </script>
 </head>
 <body>
     <a onclick="nativeInline()">Goes Nowhere</a>
     <br>
-    <a id="anchor" href="http://youtube.com" onclick="nativeInline()">
+    <a id="anchor" href="//localhost/obelus-demos" onclick="nativeInline()">
         Goes to Youtube
     </a>
     <script>
