@@ -9,13 +9,42 @@
             console.log('Native: inline');
         }
         function LBClick(el) {
-            console.log('LB> anchor clicked');
+            console.log('LB> anchor clicked', el.href);
             superagent.get(el.href, function (res) {
                 console.log('done', res);
-                document.body.innerHTML = res.text;
+                document.documentElement.innerHTML = res.text;
+                history.pushState({
+                    page: res.text
+                }, '', el.href);
                 rebindAnchors();
+                runScripts();
+                var evt = document.createEvent('Event');
+                evt.initEvent('load', false, false);
+                window.dispatchEvent(evt);
             });
         }
+        addEventListener('load', function () {
+            console.log('~~~~ Document load fired');
+        });
+        addEventListener('popstate', function (e) {
+            console.log('~~~~ Document popstate fired');
+            var page = e.state.page;
+            document.documentElement.innerHTML = page;
+            rebindAnchors();
+            runScripts();
+            var evt = document.createEvent('Event');
+            evt.initEvent('load', false, false);
+            window.dispatchEvent(evt);
+        });
+        function runScripts() {
+            var scripts = document.getElementsByTagName('script');
+            for (var i = 0; i < scripts.length; i += 1) {
+                eval(scripts[i].text);
+            }
+        }
+        /**
+         * TODO: GET http://localhost/obelus-demos/local/slowsite/second.html/index.html 404 (Not Found)
+         */
     </script>
 </head>
 <body>
@@ -30,31 +59,37 @@
         });
     </script>
     <script>
-        // anchor links
+        function isRelative(path) {
+            var absPattern = /^(https?|\/\/)/i;
+            return !absPattern.test(path);
+        }
+        function ClickHandler(el) {
+            return function (e) {
+                e = e || window.event;
+                e.cancelBubble = true;
+                if (e.preventDefault) e.preventDefault();
+                if (e.stopPropagation) e.stopPropagation();
+                LBClick(el);
+                return false;
+            };
+        }
         function rebindAnchors() {
             console.log('rebinding');
             var i, el, href,
-                urlPattern = /^(https?|\/\/)/i,
                 host = location.host,
                 set = document.getElementsByTagName('a');
             for (i = 0; i < set.length; i += 1) {
                 el = set[i];
                 href = el.getAttribute('href');
+                console.log('rebinding', href);
                 if (el.href) {
-                    console.log('testing');
-                    //el.setAttribute('href', el.href);
-                    if (!urlPattern.test(href)) {
-                        el.setAttribute('href', location.host + '/' + href);
-                        console.log('local path became', href);
+                    if (isRelative(href)) {
+                        href = href.replace(/^\/|\/$/g, '');
+                        el.href = 
+                            '//' + location.host + location.pathname + '/' + href;
+                        console.log('local path became', el.href);
                     }
-                    el.addEventListener('click', function (e) {
-                        e = e || window.event;
-                        LBClick(el);
-                        e.cancelBubble = true;
-                        if (e.preventDefault) e.preventDefault();
-                        if (e.stopPropagation) e.stopPropagation();
-                        return false;
-                    });
+                    el.addEventListener('click', ClickHandler(el));
                 }
             }
         }
