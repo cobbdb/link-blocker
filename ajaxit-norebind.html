@@ -101,19 +101,6 @@
                 console.log('rebinding', href);
                 if (el.href) {
                     if (isRelative(href)) {
-                        href = cleanPath(href);
-                        path = cleanPath(location.pathname);
-                        host = cleanPath(location.host);
-                        if (isStatic(path)) {
-                            split = path.split('/');
-                            split.pop();
-                            path = split.join('/');
-                        }
-                        el.href = (
-                            '//' + host + '/' +
-                            path + '/' + href
-                        );
-                        console.log('local path became', el.href);
                         el.addEventListener(
                             'click',
                             ClickHandler(el)
@@ -122,7 +109,7 @@
                 }
             }
         }
-        //rebindAnchors();
+        rebindAnchors();
     </script>
 </body>
 </html>

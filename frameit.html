@@ -14,9 +14,6 @@
         }
     </style>
     <script>
-        function nativeInline() {
-            console.log('Native: inline');
-        }
         function LBClick(el) {
             console.log('LB> anchor clicked');
             var frame = document.createElement('iframe');
@@ -28,44 +25,46 @@
     </script>
 </head>
 <body>
-    <a onclick="nativeInline()">Goes Nowhere</a>
+    <a id="go-cl">Opens Craigslist</a>
     <br>
-    <a id="anchor" href="//localhost/obelus-demos" onclick="nativeInline()">
+    <a id="go-ob" href="//localhost/obelus-demos">
+        Goes to obelus-demos
+    </a>
+    <br>
+    <a id="go-yt" href="//www.youtube.com">
         Goes to Youtube
     </a>
     <script>
-        document.getElementById('anchor').addEventListener('click', function () {
-            console.log('Native: event before');
-        });
-    </script>
-    <script>
-        // anchor links
-        (function () {
-            var i, el,
-                set = document.getElementsByTagName('a');
-            for (i = 0; i < set.length; i += 1) {
-                el = set[i];
-                if (el.href) {
-                    el.addEventListener('click', function (e) {
-                        e = e || window.event;
-                        LBClick(el);
-                        e.cancelBubble = true;
-                        if (e.preventDefault) e.preventDefault();
-                        if (e.stopPropagation) e.stopPropagation();
-                        return false;
-                    });
-                }
-            }
-        }());
-        // calls to window.open
-        window.open = function (dest) {
-            console.log('LB> window.open()');
+        document.getElementById('go-cl').onclick = function () {
+            open('//www.craigslist.org');
         };
     </script>
     <script>
-        document.getElementById('anchor').addEventListener('click', function () {
-            console.log('Native: event after');
-        });
+        function ClickHandler(el) {
+            return function (e) {
+                e = e || window.event;
+                e.cancelBubble = true;
+                if (e.preventDefault) e.preventDefault();
+                if (e.stopPropagation) e.stopPropagation();
+                LBClick(el);
+                return false;
+            };
+        }
+        var i, el,
+            set = document.getElementsByTagName('a');
+        for (i = 0; i < set.length; i += 1) {
+            el = set[i];
+            if (el.href) {
+                el.addEventListener(
+                    'click',
+                    ClickHandler(el)
+                );
+            }
+        }
+        // calls to window.open
+        window.open = function (dest) {
+            console.log('LB> window.open()', dest);
+        };
     </script>
 </body>
 </html>
