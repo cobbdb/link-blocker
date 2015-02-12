@@ -3,7 +3,7 @@ function isRelative(path) {
     return !absPattern.test(path);
 }
 function sameDomain(el) {
-    return el.host === location.host;
+    return el.host.indexOf(document.domain) >= 0;
 }
 function setupDOM(doc) {
     doc.body.innerHTML = '';
