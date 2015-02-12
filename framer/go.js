@@ -19,6 +19,7 @@ function setupDOM(doc) {
     });
 }
 function run(path) {
+    top.history.pushState({}, '', path);
     overlay.style.display = 'block';
     frame.src = path;
     frame.style.display = 'block';
@@ -27,6 +28,12 @@ window.addEventListener('load', function () {
     console.log('~~~~ window load fired');
 });
 
+top.document.documentElement.style.cssText = [
+    'height: 100%'
+].join(';');
+top.document.body.style.cssText = [
+    'height: 100%'
+].join(';');
 overlay = top.document.createElement('div');
 overlay.style.cssText = [
     'position: absolute',
@@ -51,12 +58,16 @@ frame.style.cssText = [
     'min-height: 100%'
 ].join(';');
 
-function create(el, top) {
+function create(el, top, type) {
     return function (e) {
-        if (!top.setup) {
-            console.log('clicked', el.href);
-            setupDOM(top.document);
-            top.setup = true;
+        console.log('clicked', el.href);
+        if (type === 'local') {
+            if (!top.setup) {
+                setupDOM(top.document);
+                top.setup = true;
+            }
+        } else {
+            top.location.href = el.href;
         }
         e.preventDefault();
         e.stopPropagation();
@@ -70,6 +81,8 @@ function rebind(doc) {
         el = set[i];
         href = el.getAttribute('href');
         if (isRelative(href) || sameDomain(el)) {
+            el.addEventListener('click', create(el, top, 'local'));
+        } else {
             el.addEventListener('click', create(el, top));
         }
     }
