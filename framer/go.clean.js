@@ -2,12 +2,15 @@ function isRelative(path) {
     var absPattern = /^([a-z]+:)*\/\//i;
     return !absPattern.test(path);
 }
+
 function isHash(path) {
     return /^#/.test(path);
 }
+
 function sameDomain(host) {
     return host.indexOf(document.domain) >= 0;
 }
+
 function setupDOM(doc) {
     doc.head.innerHTML = '';
     doc.body.innerHTML = '';
@@ -21,12 +24,14 @@ function setupDOM(doc) {
     });
     rebindFrame();
 }
+
 function run(path) {
     top.history.pushState({}, '', path);
     overlay.style.display = 'block';
     frame.src = path;
     frame.style.display = 'block';
 }
+
 window.addEventListener('load', function () {
     console.log('~~~~ window load fired');
 });
@@ -80,6 +85,7 @@ function create(el, top, type) {
         return false;
     };
 }
+
 function rebindFrame() {
     frame.contentWindow.addEventListener('beforeunload', function () {
         console.log('~~~ frame beforeunload fired');
@@ -91,6 +97,7 @@ function rebindFrame() {
         }
     });
 }
+
 function rebind(doc) {
     var i, el, href, set = doc.getElementsByTagName('a');
     for (i = 0; i < set.length; i += 1) {
@@ -107,6 +114,7 @@ function rebind(doc) {
         }
     }
 }
+
 if (!top.running) {
     rebind(top.document);
     top.running = true;
