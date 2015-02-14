@@ -11,13 +11,15 @@ function sameDomain(host) {
     return host.indexOf(document.domain) >= 0;
 }
 
-function setupDOM(doc) {
+function setupDOM() {
+    var doc = top.document;
     doc.head.innerHTML = '';
     doc.body.innerHTML = '';
     doc.body.appendChild(frame);
     doc.body.appendChild(overlay);
     frame.addEventListener('load', function () {
         console.log('~~~ frame load fired');
+        top.history.pushState({}, '', location.href);
         overlay.style.display = 'none';
         rebind(frame.contentDocument);
         rebindFrame();
@@ -32,16 +34,9 @@ function run(path) {
     frame.style.display = 'block';
 }
 
-window.addEventListener('load', function () {
-    console.log('~~~~ window load fired');
-});
+top.document.documentElement.style.height = '100%';
+top.document.body.style.height = '100%';
 
-top.document.documentElement.style.cssText = [
-    'height: 100%'
-].join(';');
-top.document.body.style.cssText = [
-    'height: 100%'
-].join(';');
 overlay = top.document.createElement('div');
 overlay.style.cssText = [
     'position: absolute',
@@ -73,7 +68,7 @@ function create(el, top, type) {
         clicktime = Date.now();
         if (type === 'local') {
             if (!top.setup) {
-                setupDOM(top.document);
+                setupDOM();
                 top.setup = true;
             }
             run(el.href);
@@ -88,13 +83,7 @@ function create(el, top, type) {
 
 function rebindFrame() {
     frame.contentWindow.addEventListener('beforeunload', function () {
-        console.log('~~~ frame beforeunload fired');
-        var el = frame.contentDocument.activeElement.href;
-        if (isRelative(el.href) || sameDomain(el.host)) {
-            top.history.pushState({}, '', el.path);
-            overlay.style.display = 'block';
-            frame.style.display = 'block';
-        }
+        overlay.style.display = 'block';
     });
 }
 
